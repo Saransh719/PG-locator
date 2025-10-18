@@ -1,5 +1,16 @@
 import React, { useState, useMemo, useRef } from 'react';
-import { View, StyleSheet, TextInput, Text, TouchableOpacity, KeyboardAvoidingView, Platform, Alert, ScrollView } from 'react-native';
+import { 
+  View, 
+  StyleSheet, 
+  TextInput, 
+  Text, 
+  TouchableOpacity, 
+  KeyboardAvoidingView, 
+  Platform, 
+  Alert, 
+  ScrollView, 
+  Switch 
+} from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { WebView } from 'react-native-webview';
 import { usePg } from '../context/PgContext';
@@ -9,7 +20,7 @@ export default function AddPgScreen({ navigation }) {
   const webviewRef = useRef(null);
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
-  const [availability, setAvailability] = useState('');
+  const [isAvailable, setIsAvailable] = useState(true); // ✅ BOOLEAN STATE
   const [location, setLocation] = useState('');
   const [selectedLat, setSelectedLat] = useState(null);
   const [selectedLng, setSelectedLng] = useState(null);
@@ -40,7 +51,6 @@ export default function AddPgScreen({ navigation }) {
 
           let selectedMarker = null;
 
-          // Notify RN to disable parent scroll when interacting with map
           const startInteract = () => RN.postMessage(JSON.stringify({ type: 'touchStart' }));
           const endInteract = () => RN.postMessage(JSON.stringify({ type: 'touchEnd' }));
           document.addEventListener('touchstart', startInteract, { passive: true });
@@ -62,7 +72,6 @@ export default function AddPgScreen({ navigation }) {
             }));
           });
 
-          // Receive messages from React Native
           document.addEventListener('message', (event) => {
             try {
               const msg = JSON.parse(event.data);
@@ -81,20 +90,20 @@ export default function AddPgScreen({ navigation }) {
   };
 
   const onAdd = () => {
-    if (!name || !price || !selectedLat || !selectedLng) {
-      Alert.alert('Missing data', 'Please fill Name, Price and select location on map');
-      return;
+    if (!name || !price || !selectedLat || !selectedLng || !location.trim()) {
+        Alert.alert("Missing data", "Please fill Name, Price, Location, and select a location on the map");
+        return;
     }
-    addPg({ 
-      name, 
-      price: Number(price), 
-      availability: availability || 'Available', 
-      lat: selectedLat, 
-      lng: selectedLng, 
-      location 
+    addPg({
+        name,
+        price: Number(price),
+        available: isAvailable,
+        lat: selectedLat,
+        lng: selectedLng,
+        location: location.trim(), // Include location
     });
     navigation.goBack();
-  };
+};
 
   const handleWebViewMessage = (event) => {
     try {
@@ -137,48 +146,68 @@ export default function AddPgScreen({ navigation }) {
 
   return (
     <SafeAreaView style={{ flex: 1, backgroundColor: '#f8fafc' }}>
-    <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
-      <ScrollView style={styles.container} scrollEnabled={scrollEnabled} keyboardShouldPersistTaps="handled">
-        <View style={styles.formSection}>
-          <Text style={styles.header}>Add PG</Text>
-          <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
-          <TextInput style={styles.input} placeholder="Price" value={price} onChangeText={setPrice} keyboardType="numeric" />
-          <TextInput style={styles.input} placeholder="Availability" value={availability} onChangeText={setAvailability} />
-          <TextInput 
-            style={styles.input} 
-            placeholder="Location (Area/Locality)" 
-            value={location} 
-            onChangeText={setLocation}
-            onSubmitEditing={centerMapOnLocation}
-          />
-          
-          <Text style={styles.mapLabel}>Tap on map to select location:</Text>
-          <View style={styles.mapContainer}>
-            <WebView
-              ref={webviewRef}
-              originWhitelist={["*"]}
-              source={{ html }}
-              onMessage={handleWebViewMessage}
-              javaScriptEnabled
-              domStorageEnabled
-              mixedContentMode="always"
-              allowFileAccess
-              allowUniversalAccessFromFileURLs
+      <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
+        <ScrollView style={styles.container} scrollEnabled={scrollEnabled} keyboardShouldPersistTaps="handled">
+          <View style={styles.formSection}>
+            <Text style={styles.header}>Add PG</Text>
+            
+            <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
+            
+            <TextInput 
+              style={styles.input} 
+              placeholder="Price" 
+              value={price} 
+              onChangeText={setPrice} 
+              keyboardType="numeric" 
             />
+            
+            {/* ✅ CHECKBOX REPLACEMENT */}
+            <View style={styles.switchContainer}>
+              <Text style={styles.switchLabel}>Available</Text>
+              <Switch
+                trackColor={{ false: '#e5e7eb', true: '#2563eb' }}
+                thumbColor={isAvailable ? '#ffffff' : '#f4f4f4'}
+                ios_backgroundColor="#e5e7eb"
+                onValueChange={setIsAvailable}
+                value={isAvailable}
+              />
+            </View>
+            
+            <TextInput 
+              style={styles.input} 
+              placeholder="Location (Area/Locality)" 
+              value={location} 
+              onChangeText={setLocation}
+              onSubmitEditing={centerMapOnLocation}
+            />
+            
+            <Text style={styles.mapLabel}>Tap on map to select location:</Text>
+            <View style={styles.mapContainer}>
+              <WebView
+                ref={webviewRef}
+                originWhitelist={["*"]}
+                source={{ html }}
+                onMessage={handleWebViewMessage}
+                javaScriptEnabled
+                domStorageEnabled
+                mixedContentMode="always"
+                allowFileAccess
+                allowUniversalAccessFromFileURLs
+              />
+            </View>
+            
+            {selectedLat && selectedLng && (
+              <Text style={styles.selectedLocation}>
+                Selected: {selectedLat.toFixed(4)}, {selectedLng.toFixed(4)}
+              </Text>
+            )}
+            
+            <TouchableOpacity style={styles.addBtn} onPress={onAdd}>
+              <Text style={styles.addBtnText}>Save PG</Text>
+            </TouchableOpacity>
           </View>
-          
-          {selectedLat && selectedLng && (
-            <Text style={styles.selectedLocation}>
-              Selected: {selectedLat.toFixed(4)}, {selectedLng.toFixed(4)}
-            </Text>
-          )}
-          
-          <TouchableOpacity style={styles.addBtn} onPress={onAdd}>
-            <Text style={styles.addBtnText}>Save PG</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 }
@@ -206,6 +235,24 @@ const styles = StyleSheet.create({
     backgroundColor: '#fff',
     marginBottom: 12,
     fontSize: 16,
+  },
+  // ✅ NEW SWITCH STYLES
+  switchContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    backgroundColor: '#fff',
+    paddingHorizontal: 12,
+    paddingVertical: 12,
+    borderWidth: 1,
+    borderColor: '#d1d5db',
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  switchLabel: {
+    fontSize: 16,
+    color: '#374151',
+    fontWeight: '500',
   },
   mapLabel: {
     fontSize: 16,
@@ -241,5 +288,3 @@ const styles = StyleSheet.create({
     fontSize: 16,
   },
 });
-
-

@@ -18,14 +18,27 @@ app.post("/pgs", async (req, res) => {
 
 // Get all PGs
 app.get("/pgs", async (req, res) => {
-    const pgs = await PG.find();
+    const pgs = await PG.find({available : true});
     res.json(pgs);
 });
 
 app.get("/pgs/search", async (req, res) => {
-    const { maxPrice } = req.query;
-    const result = await PG.find({ price: { $lte: maxPrice } });
-    res.json(result);
+    const { maxPrice, location } = req.query;
+
+    const query = {};
+    if (maxPrice) {
+        query.price = { $lte: Number(maxPrice) };
+    }
+    if (location) {
+        query.location = { $regex: location, $options: "i" }; // Case-insensitive substring match
+    }
+
+    try {
+        const result = await PG.find(query);
+        res.json(result);
+    } catch (err) {
+        res.status(500).json({ error: "Failed to fetch PGs" });
+    }
 });
 
 app.listen(process.env.PORT,"0.0.0.0",function()
