@@ -71,26 +71,4 @@ export function usePg() {
 }
 
 
-function PgSearchComponent() {
-  const { searchPgs, pgs, loading, error } = usePg();
-
-  useEffect(() => {
-    // Search for PGs with a maximum price of 5000
-    searchPgs({ maxPrice: 5000 });
-  }, [searchPgs]);
-
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
-
-  return (
-    <ul>
-      {pgs.map((pg) => (
-        <li key={pg._id}>{pg.name} - ${pg.price}</li>
-      ))}
-    </ul>
-  );
-}
-
-export default PgSearchComponent;
-
 
