@@ -149,8 +149,6 @@ export default function AddPgScreen({ navigation }) {
       <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : undefined}>
         <ScrollView style={styles.container} scrollEnabled={scrollEnabled} keyboardShouldPersistTaps="handled">
           <View style={styles.formSection}>
-            <Text style={styles.header}>Add PG</Text>
-            
             <TextInput style={styles.input} placeholder="Name" value={name} onChangeText={setName} />
             
             <TextInput 

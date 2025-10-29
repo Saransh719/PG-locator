@@ -59,8 +59,24 @@ export function PgProvider({ children }) {
     }
 }, []);
 
+const updatePg = useCallback(async (id, updatedData) => {
+  try {
+    const response = await axios.put(`${BASE_URL}/pgs/${id}`, updatedData, {
+      headers: { "Content-Type": "application/json" },
+    });
+
+    // update local state with the edited PG
+    setPgs((prev) =>
+      prev.map((pg) => (pg._id === id ? response.data : pg))
+    );
+  } catch (err) {
+    console.error("Failed to update PG:", err.message);
+  }
+}, []);
+
+
   return (
-    <PgContext.Provider value={{ pgs, addPg, searchPgs, loading, error }}>
+    <PgContext.Provider value={{ pgs, addPg, searchPgs,updatePg, loading, error }}>
       {children}
     </PgContext.Provider>
   );

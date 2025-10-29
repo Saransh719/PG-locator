@@ -14,6 +14,7 @@ import { usePg } from '../context/PgContext';
 
 export default function MapScreen({ navigation }) {
   const { searchPgs, pgs, loading, error } = usePg();
+  pgs.filter(pg => pg.available);
   const webviewRef = useRef(null);
   const [filterLocation, setFilterLocation] = useState('');
   const [filterMaxPrice, setFilterMaxPrice] = useState('');
