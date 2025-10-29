@@ -1,8 +1,8 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import axios from 'axios'; // Import axios
-import {HOST,PORT} from '@env';
+import {BASE_URL} from '@env';
 
-var BASE_URL=`http://${HOST}:${PORT}`;
+// var BASE_URL=`http://${HOST}:${PORT}`;
 
 const PgContext = createContext({
   pgs: [],

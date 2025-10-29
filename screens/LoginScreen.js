@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, KeyboardAvoidingView, Platform, ScrollView, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../config/firebase';
+import Toast from 'react-native-toast-message';
 
 export default function LoginScreen({ navigation }) {
   const [email, setEmail] = useState('');
@@ -10,6 +11,7 @@ export default function LoginScreen({ navigation }) {
   const [isSignUp, setIsSignUp] = useState(false);
 
   const handleLogin = async () => {
+    Keyboard.dismiss();
     if (!email || !password) {
       Alert.alert('Missing info', 'Please enter email and password');
       return;
@@ -18,10 +20,16 @@ export default function LoginScreen({ navigation }) {
     try {
       if (isSignUp) {
         await createUserWithEmailAndPassword(auth, email.trim(), password);
-        Alert.alert('Success', 'Account created successfully!');
+        Toast.show({
+          type: 'success',
+          text1: 'Account created successfully!',
+        });
       } else {
         await signInWithEmailAndPassword(auth, email.trim(), password);
-        Alert.alert('Success', 'Logged in successfully');
+        Toast.show({
+          type: 'success',
+          text1: 'Logged in successfully',
+        });
       }
       navigation.replace('Map');
     } catch (err) {

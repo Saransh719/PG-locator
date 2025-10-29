@@ -8,7 +8,7 @@ import EditPgScreen from './screens/EditPgScreen';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { PgProvider } from './context/PgContext';
-
+import Toast from 'react-native-toast-message';
 
 export default function App() {
   const Stack = createNativeStackNavigator();
@@ -28,8 +28,10 @@ export default function App() {
           <Stack.Screen name="EditPg" component={EditPgScreen} options={{ title: 'Edit PG' }} />
         </Stack.Navigator>
       </NavigationContainer>
+      <Toast position='bottom' />
       <StatusBar style="auto" />
     </PgProvider>
+    
   );
 }
 
