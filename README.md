@@ -27,8 +27,8 @@ No local setup required — the app connects to a live REST API hosted online.
 Built using React Navigation for seamless transitions across multiple screens.
 
 # 📸Screenshots
-<img src="ss/login.jpg" width="200"/><img src="ss/map.jpg" width="200"/><img src="ss/filter.jpg" width="200"/><br>
-<img src="ss/showall.jpg" width="200"/><img src="ss/add.jpg" width="200"/><img src="ss/edit.jpg" width="200"/>
+<img src="ss/login.jpg" width="200"/>  <img src="ss/map.jpg" width="200"/>  <img src="ss/filter.jpg" width="200"/><br>
+<img src="ss/showall.jpg" width="200"/>  <img src="ss/add.jpg" width="200"/>  <img src="ss/edit.jpg" width="200"/>
 
 # 🧰 Tech Stack
 ### Frontend
